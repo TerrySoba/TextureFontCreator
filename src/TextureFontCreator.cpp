@@ -181,7 +181,7 @@ bool TextureFontCreator::writeToFile(const std::string& path) {
 
 	fp.write(fileSignature.data(), fileSignature.size());
 
-	uint16_t formatVersion = 3;
+    uint16_t formatVersion = 4;
 	writeToStream(fp, formatVersion);
 
 	// write font name
@@ -195,8 +195,7 @@ bool TextureFontCreator::writeToFile(const std::string& path) {
 	writeToStream(fp, height); // write height of image
 
 	{
-		GrayImage imageCopy(*m_image);
-		imageCopy.flipVertically();
+        GrayImage imageCopy(*m_image);
 		for (uint32_t row = 0; row < imageCopy.getHeight(); row++) { // write image to file
 			fp.write(reinterpret_cast<const char*>(imageCopy.getRow(row)),
 					 imageCopy.getWidth());
