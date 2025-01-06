@@ -23,12 +23,12 @@
  *  font.
  */
 struct ImageCharacter {
-	std::shared_ptr<GrayImage> image;  //!< Pointer to the image of the character
-	int32_t bitmap_left; //!< bearing from top of the bitmap
-	int32_t bitmap_top; //!< bearing from left of the bitmap
-	double horiAdvance; //!< horizontal advance of character
-	double vertAdvance; //!< vertical advance of character
-	uint32_t unicode; //!< unicode codepoint of this character
+    std::shared_ptr<GrayImage> image;  //!< Pointer to the image of the character
+    int32_t bitmap_left; //!< bearing from top of the bitmap
+    int32_t bitmap_top; //!< bearing from left of the bitmap
+    double horiAdvance; //!< horizontal advance of character
+    double vertAdvance; //!< vertical advance of character
+    uint32_t unicode; //!< unicode codepoint of this character
 };
 
 /*! \brief Wrapper to the FreeType2 Library
@@ -39,32 +39,32 @@ struct ImageCharacter {
  */
 class FreeTypeRender {
 public:
-	/*! \brief Constructor
-	 *
-	 *  \param fontpath the path to the TrueType font
-	 *  \param fontSize size of the font in pixels
-	 */
-	FreeTypeRender(const std::string& fontpath, double fontSize, bool enableAntiAliasing = true, bool enableHinting = true);
-	virtual ~FreeTypeRender();
+    /*! \brief Constructor
+     *
+     *  \param fontpath the path to the TrueType font
+     *  \param fontSize size of the font in pixels
+     */
+    FreeTypeRender(const std::string& fontpath, double fontSize, bool enableAntiAliasing = true, bool enableHinting = true);
+    virtual ~FreeTypeRender();
 
-	/*! \brief renders a single character
-	 *
-	 *  The character is rendered into a greyscale image. It is returned in
-	 *  an ImageCharacter structure that also contains information on how to
-	 *  use the character as a font.
-	 *
-	 *  \param character unicode point to render
-	 *  \return an ImageCharacter structure of the character
-	 */
-	std::shared_ptr<ImageCharacter> renderUnicodeCharacter(uint32_t character);
+    /*! \brief renders a single character
+     *
+     *  The character is rendered into a greyscale image. It is returned in
+     *  an ImageCharacter structure that also contains information on how to
+     *  use the character as a font.
+     *
+     *  \param character unicode point to render
+     *  \return an ImageCharacter structure of the character
+     */
+    std::shared_ptr<ImageCharacter> renderUnicodeCharacter(uint32_t character);
 
-	std::string getFontName();
+    std::string getFontName();
 
 private:
-	FT_Library m_library;
-	FT_Face m_face;
-	bool m_enableAntiAliasing;
-	bool m_enableHinting;
+    FT_Library m_library;
+    FT_Face m_face;
+    bool m_enableAntiAliasing;
+    bool m_enableHinting;
 };
 
 #endif /* FREETYPERENDER_H_ */

@@ -17,12 +17,13 @@ public:
     ~TextureFontCreatorGUI();
 
 public slots:
-	void browseFontPath();
-	void updatePreview();
-	void saveAs();
+    void browseFontPath();
+    void updatePreview();
+    void saveAs();
+    void saveAsJson();
 
 private:
-	std::shared_ptr<TextureFontCreator> createTextureFont();
+    std::shared_ptr<TextureFontCreator> createTextureFont();
 
     Ui::TextureFontCreatorGUIClass m_ui;
     QPixmap m_pixmap;

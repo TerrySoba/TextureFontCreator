@@ -6,6 +6,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 find_package (ICU 4.4 REQUIRED)
 FIND_PACKAGE (Qt5Widgets REQUIRED)
 find_package (Freetype 2.3 REQUIRED)
+find_package (nlohmann_json 3.11.0 REQUIRED)
 
 include_directories(${FREETYPE_INCLUDE_DIRS} ${ICU_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR}/src)
 

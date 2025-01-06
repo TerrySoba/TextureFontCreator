@@ -15,32 +15,33 @@
 #include "FreeTypeRender.h"
 
 struct ImageOffset {
-	std::shared_ptr<ImageCharacter> imgChar;
-	int32_t left;
-	int32_t top;
+    std::shared_ptr<ImageCharacter> imgChar;
+    int32_t left;
+    int32_t top;
 };
 
 class TextureFontCreator {
 public:
-	virtual ~TextureFontCreator();
-	TextureFontCreator(
-		const std::string& fontpath,
-		double fontSize,
-		bool forcePowerOfTwoSize,
-		const std::string& chars,
-		bool enableAntiAliasing,
-		bool enableHinting);
+    virtual ~TextureFontCreator();
+    TextureFontCreator(
+        const std::string& fontpath,
+        double fontSize,
+        bool forcePowerOfTwoSize,
+        const std::string& chars,
+        bool enableAntiAliasing,
+        bool enableHinting);
 
-	std::shared_ptr<GrayImage> getImage() { return m_image; }
+    std::shared_ptr<GrayImage> getImage() { return m_image; }
 
-	bool writeToFile(const std::string& path);
+    void writeToFile(const std::string& path);
+    void writeToJsonFile(const std::string& path);
 
-	std::string getFontName() { return m_fontName; }
+    std::string getFontName() { return m_fontName; }
 
 private:
-	std::shared_ptr<GrayImage> m_image;
-	std::vector<ImageOffset> m_imageCharacters;
-	std::string m_fontName;
+    std::shared_ptr<GrayImage> m_image;
+    std::vector<ImageOffset> m_imageCharacters;
+    std::string m_fontName;
 };
 
 #endif /* TEXTUREFONTCREATOR_H_ */

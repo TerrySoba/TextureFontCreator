@@ -40,6 +40,8 @@ add_library(
     ${${PROJECT_NAME}_RESOURCES_RCC}
 )
 
+
+
 target_link_libraries(${PROJECT_NAME} ${ICU_LIBRARIES} ${FREETYPE_LIBRARIES} Qt5::Widgets)
 
 add_executable(
@@ -48,3 +50,7 @@ add_executable(
 )
 
 target_link_libraries(${PROJECT_NAME}Gui ${PROJECT_NAME})
+
+# enable C++20
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+target_compile_features(${PROJECT_NAME}Gui PUBLIC cxx_std_20)
