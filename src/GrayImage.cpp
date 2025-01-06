@@ -22,23 +22,27 @@ GrayImage::GrayImage(FT_Bitmap& bitmap) {
 	this->width = bitmap.width;
 	this->rows = bitmap.rows;
 
-	if (bitmap.pixel_mode != FT_PIXEL_MODE_GRAY) {
-		std::cerr << "FreeType delivered invalid pixel mode:" << (int32_t)bitmap.pixel_mode << std::endl;
-		this->width = 0;
-		this->rows = 0;
-		this->pitch = 0;
-	} else {
-		for (int32_t row = 0; row < bitmap.rows; row++) {
-			if (bitmap.num_grays == 256) {
-				memcpy(data.data() + row * pitch, bitmap.buffer + row * bitmap.pitch, width);
-			} else {
-				double factor = (1.0 / (double) bitmap.num_grays) * 256;
-				std::cout << "factor:" << factor << std::endl;
-				for (uint32_t y = 0; y < width; y++) {
-					data[row * pitch + y] =	bitmap.buffer[row * bitmap.pitch + y] * factor;
+	switch(bitmap.pixel_mode) {
+		case FT_PIXEL_MODE_MONO:
+			for (int32_t row = 0; row < bitmap.rows; row++) {
+				for (int32_t x = 0; x < bitmap.width; x++) {
+					data[row * pitch + x] = (bitmap.buffer[row * bitmap.pitch + x / 8] & (1 << (7 - x % 8))) ? 255 : 0;
 				}
 			}
-		}
+			break;
+
+		case FT_PIXEL_MODE_GRAY:
+			for (int32_t row = 0; row < bitmap.rows; row++) {
+				memcpy(data.data() + row * pitch, bitmap.buffer + row * bitmap.pitch, width);
+			}
+			break;
+
+		default:
+			std::cerr << "FreeType delivered invalid pixel mode:" << (int32_t)bitmap.pixel_mode << std::endl;
+			this->width = 0;
+			this->rows = 0;
+			this->pitch = 0;
+
 	}
 }
 

@@ -24,11 +24,11 @@ public slots:
 private:
 	std::shared_ptr<TextureFontCreator> createTextureFont();
 
-    Ui::TextureFontCreatorGUIClass ui;
-    QPixmap pixmap;
-    QString lastSavePath;
-    QGraphicsScene scene;
-    QGraphicsPixmapItem* pixmapItem;
+    Ui::TextureFontCreatorGUIClass m_ui;
+    QPixmap m_pixmap;
+    QString m_lastSavePath;
+    QGraphicsScene m_scene;
+    QGraphicsPixmapItem* m_pixmapItem;
 };
 
 #endif // TEXTUREFONTCREATORGUI_H

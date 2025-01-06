@@ -44,7 +44,7 @@ public:
 	 *  \param fontpath the path to the TrueType font
 	 *  \param fontSize size of the font in pixels
 	 */
-	FreeTypeRender(const std::string& fontpath, double fontSize);
+	FreeTypeRender(const std::string& fontpath, double fontSize, bool enableAntiAliasing = true, bool enableHinting = true);
 	virtual ~FreeTypeRender();
 
 	/*! \brief renders a single character
@@ -61,8 +61,10 @@ public:
 	std::string getFontName();
 
 private:
-	FT_Library library;
-	FT_Face face;
+	FT_Library m_library;
+	FT_Face m_face;
+	bool m_enableAntiAliasing;
+	bool m_enableHinting;
 };
 
 #endif /* FREETYPERENDER_H_ */

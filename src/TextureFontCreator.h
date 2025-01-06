@@ -23,7 +23,13 @@ struct ImageOffset {
 class TextureFontCreator {
 public:
 	virtual ~TextureFontCreator();
-	TextureFontCreator(const std::string& fontpath, double fontSize, bool forcePowerOfTwoSize, const std::string& chars);
+	TextureFontCreator(
+		const std::string& fontpath,
+		double fontSize,
+		bool forcePowerOfTwoSize,
+		const std::string& chars,
+		bool enableAntiAliasing,
+		bool enableHinting);
 
 	std::shared_ptr<GrayImage> getImage() { return m_image; }
 

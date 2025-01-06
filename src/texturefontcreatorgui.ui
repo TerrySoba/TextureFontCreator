@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1014</width>
-    <height>1124</height>
+    <width>991</width>
+    <height>788</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,6 +27,20 @@
          <string>Font Input</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="3">
+          <widget class="QPushButton" name="fontPathBrowseButton">
+           <property name="text">
+            <string>Browse</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Render Settings</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
@@ -34,24 +48,10 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="0" column="2">
           <widget class="QLineEdit" name="fontPathEdit"/>
          </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="fontPathBrowseButton">
-           <property name="text">
-            <string>Browse</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Font Size</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
+         <item row="1" column="2">
           <widget class="QDoubleSpinBox" name="fontInputSizeSpinBox">
            <property name="suffix">
             <string>px</string>
@@ -64,6 +64,33 @@
            </property>
            <property name="value">
             <double>20.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Font Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QCheckBox" name="antialisedCheckBox">
+           <property name="text">
+            <string>Antialised</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QCheckBox" name="hintedCheckBox">
+           <property name="text">
+            <string>Hinted</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -228,7 +255,31 @@
         <property name="checkable">
          <bool>false</bool>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Zoom:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSlider" name="zoomSlider">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>20</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item>
           <widget class="QGraphicsView" name="previewGraphicsView">
            <property name="cursor" stdset="0">
@@ -278,8 +329,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1014</width>
-     <height>38</height>
+     <width>991</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

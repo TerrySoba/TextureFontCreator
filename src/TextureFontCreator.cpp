@@ -64,10 +64,10 @@ private:
 };
 
 
-TextureFontCreator::TextureFontCreator(const std::string& fontpath, double fontSize, bool forcePowerOfTwoSize, const std::string& chars) {
-	FreeTypeRender renderer(fontpath, fontSize);
+TextureFontCreator::TextureFontCreator(const std::string& fontpath, double fontSize, bool forcePowerOfTwoSize, const std::string& chars, bool enableAntiAliasing, bool enableHinting) {
+	FreeTypeRender renderer(fontpath, fontSize, enableAntiAliasing, enableHinting);
 	m_fontName = renderer.getFontName();
-	UnicodeString str(chars.c_str(), "UTF-8");
+	icu::UnicodeString str(chars.c_str(), "UTF-8");
 
 	// eliminate duplicates by putting the characters in a set
 	std::set<uint32_t> characterSet;
