@@ -8,7 +8,7 @@
 #include "GrayImage.h"
 
 #include <iostream>
-#include <format>
+#include <sstream>
 
 GrayImage::GrayImage(uint32_t width, uint32_t height, uint8_t fill) {
     data.resize(width * height, fill);
@@ -40,8 +40,9 @@ GrayImage::GrayImage(FT_Bitmap& bitmap) {
 
         default:
             // throw exception
-            std::string errorText = std::format("FreeType delivered invalid pixel mode: {}", (int32_t)bitmap.pixel_mode);
-            throw std::runtime_error(errorText);
+            std::stringstream errorText;
+            errorText << "FreeType delivered invalid pixel mode: " << static_cast<int32_t>(bitmap.pixel_mode);
+            throw std::runtime_error(errorText.str());
     }
 }
 

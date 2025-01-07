@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <unicode/unistr.h>
-#include <format>
+#include <sstream>
 
 FreeTypeRender::FreeTypeRender(const std::string& fontpath, double fontSize, bool enableAntiAliasing, bool enableHinting)
     : m_enableAntiAliasing(enableAntiAliasing), m_enableHinting(enableHinting)
@@ -21,8 +21,9 @@ FreeTypeRender::FreeTypeRender(const std::string& fontpath, double fontSize, boo
     int error = FT_Init_FreeType(&m_library);
     
     if (error) {
-        std::string errorText = std::format("Could not initialize Freetype2: error #{}", error);
-        throw std::runtime_error(errorText);
+        std::stringstream errorText;
+        errorText << "Could not initialize Freetype2: error #" << error;
+        throw std::runtime_error(errorText.str());
     }
 
     // now load font face
@@ -61,8 +62,9 @@ std::shared_ptr<ImageCharacter> FreeTypeRender::renderUnicodeCharacter(uint32_t 
 
     int error = FT_Load_Char(m_face, character, flags);
     if (error) {
-        std::string errorText = std::format("Could not load character: {}", character);
-        throw std::runtime_error(errorText);
+        std::stringstream errorText;
+        errorText << "Could not load character: " << character;
+        throw std::runtime_error(errorText.str());
     }
 
     std::shared_ptr<GrayImage> image(new GrayImage(m_face->glyph->bitmap));

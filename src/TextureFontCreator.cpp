@@ -11,7 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
-#include <format>
+#include <sstream>
 #include <filesystem>
 
 #include <nlohmann/json.hpp>
@@ -179,8 +179,9 @@ void TextureFontCreator::writeToFile(const std::string& path) {
 
     std::fstream fp(std::filesystem::u8path(path), std::fstream::out | std::fstream::binary);
     if (fp.fail()) {
-        std::string errorText = std::format("Could not open file \"{}\" for writing. Aborting...", path);
-        throw std::runtime_error(errorText);
+        std::stringstream errorText;
+        errorText << "Could not open file \"" << path << "\" for writing. Aborting...";
+        throw std::runtime_error(errorText.str());
     }
 
     std::string fileSignature = "ytf252";
@@ -269,8 +270,9 @@ void TextureFontCreator::writeToJsonFile(const std::string& path)
 
     std::fstream fp(std::filesystem::u8path(path), std::fstream::out | std::fstream::binary);
     if (fp.fail()) {
-        std::string errorText = std::format("Could not open file \"{}\" for writing. Aborting...", path);
-        throw std::runtime_error(errorText);
+        std::stringstream errorText;
+        errorText <<"Could not open file \"" << path << "\" for writing. Aborting...";
+        throw std::runtime_error(errorText.str());
     }
 
     fp << json.dump(4);
