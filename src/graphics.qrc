@@ -1,6 +1,6 @@
 <RCC>
-    <qresource prefix="/new/prefix1">
-        <file alias="EmptyGFX">../gfx/empty.png</file>
-        <file alias="Icon">../gfx/icon.png</file>
-    </qresource>
+  <qresource prefix="/">
+    <file>about.ui</file>
+    <file alias="icon.png">../gfx/icon.png</file>
+  </qresource>
 </RCC>

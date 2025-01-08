@@ -5,7 +5,9 @@
 #include "ui_texturefontcreatorgui.h"
 #include <QPixmap>
 #include <QGraphicsScene>
+#include <QUiLoader>
 #include <memory>
+
 #include "TextureFontCreator.h"
 
 class TextureFontCreatorGUI : public QMainWindow
@@ -22,6 +24,8 @@ public slots:
     void saveAs();
     void saveAsJson();
 
+    void showAboutDialog();
+
 private:
     std::shared_ptr<TextureFontCreator> createTextureFont();
 
@@ -30,6 +34,8 @@ private:
     QString m_lastSavePath;
     QGraphicsScene m_scene;
     QGraphicsPixmapItem* m_pixmapItem;
+
+    QWidget* m_aboutDialog;
 };
 
 #endif // TEXTUREFONTCREATORGUI_H

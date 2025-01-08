@@ -16,11 +16,29 @@ std::u8string toU8String(const QString& str) {
 
 } // anonymous namespace
 
+static QWidget* createAboutDialog()
+{
+    QFile file(":/about.ui");
+    if (!file.open(QFile::ReadOnly))
+    {
+        throw std::runtime_error("Could not open UI file");
+    }
+
+    QUiLoader loader;
+    QWidget* aboutDialog = loader.load(&file);
+    file.close();
+
+    return aboutDialog;
+}
+
 TextureFontCreatorGUI::TextureFontCreatorGUI(QWidget *parent)
     : QMainWindow(parent),
-      m_pixmapItem(NULL)
+      m_pixmapItem(nullptr),
+      m_aboutDialog(nullptr)
 {
     m_ui.setupUi(this);
+
+    m_aboutDialog = createAboutDialog();
 
     m_ui.previewGraphicsView->setScene(&m_scene);
 
@@ -28,6 +46,8 @@ TextureFontCreatorGUI::TextureFontCreatorGUI(QWidget *parent)
     connect(m_ui.updatePreviewButton, SIGNAL(clicked()), this, SLOT(updatePreview()));
     connect(m_ui.actionSave_Texture_Font, SIGNAL(triggered(bool)), this, SLOT(saveAs()));
     connect(m_ui.actionSave_JSON_File, SIGNAL(triggered(bool)), this, SLOT(saveAsJson()));
+
+    connect(m_ui.actionAbout, SIGNAL(triggered(bool)), this, SLOT(showAboutDialog()));
 
     // load configuration
     QSettings settings("TextureFontCreator", "TextureFontCreator");
@@ -47,6 +67,14 @@ TextureFontCreatorGUI::TextureFontCreatorGUI(QWidget *parent)
 
     m_ui.customCharacterSetGroupBox->setChecked(settings.value("customCharacterset", false).toBool());
     m_ui.customCharacterSetTextEdit->setText(settings.value("customCharactersetString", "").toString());
+}
+
+void TextureFontCreatorGUI::showAboutDialog()
+{
+    if (m_aboutDialog)
+    {
+        m_aboutDialog->show();
+    }
 }
 
 std::shared_ptr<TextureFontCreator> TextureFontCreatorGUI::createTextureFont() {

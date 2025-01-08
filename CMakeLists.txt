@@ -6,11 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools)
 find_package(Freetype 2.3 REQUIRED)
 find_package(nlohmann_json 3.11.0 REQUIRED)
 
 qt_standard_project_setup()
+set(CMAKE_AUTORCC ON)
 
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
@@ -31,5 +32,5 @@ qt_add_executable(
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt6::Widgets Qt6::Core
+    Qt6::Widgets Qt6::Core Qt6::UiTools
     ${FREETYPE_LIBRARIES})
