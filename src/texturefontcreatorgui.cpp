@@ -8,7 +8,13 @@
 #include <QSettings>
 #include <QGraphicsItem>
 
+namespace { // anonymous namespace
 
+std::u8string toU8String(const QString& str) {
+    return std::u8string(reinterpret_cast<const char8_t*>(str.toUtf8().constData()));
+}
+
+} // anonymous namespace
 
 TextureFontCreatorGUI::TextureFontCreatorGUI(QWidget *parent)
     : QMainWindow(parent),
@@ -45,7 +51,7 @@ TextureFontCreatorGUI::TextureFontCreatorGUI(QWidget *parent)
 
 std::shared_ptr<TextureFontCreator> TextureFontCreatorGUI::createTextureFont() {
     // create string with selected charsets
-    std::string charSets = "";
+    std::u8string charSets;
     if (m_ui.ASCII_checkBox->isChecked()) {
         charSets += CHAR_SET_ASCII;
     }
@@ -53,9 +59,9 @@ std::shared_ptr<TextureFontCreator> TextureFontCreatorGUI::createTextureFont() {
         charSets += CHAR_SET_ISO_8859_15_danish;
     }
     if (m_ui.customCharacterSetGroupBox->isChecked()) {
-        QByteArray utf8_text =
-                m_ui.customCharacterSetTextEdit->document()->toPlainText().toUtf8();
-        charSets += utf8_text.constData();
+        auto utf8_text =
+                toU8String(m_ui.customCharacterSetTextEdit->document()->toPlainText());
+        charSets += utf8_text;
     }
     if (m_ui.japaneseHiraganaCheckbox->isChecked()) {
         charSets += JAPANESE_HIRAGANA;
@@ -67,7 +73,7 @@ std::shared_ptr<TextureFontCreator> TextureFontCreatorGUI::createTextureFont() {
         charSets += JAPANESE_JOYO_KANJI;
     }
 
-    auto creator = std::make_shared<TextureFontCreator>(m_ui.fontPathEdit->text().toStdString().c_str(),
+    auto creator = std::make_shared<TextureFontCreator>(toU8String(m_ui.fontPathEdit->text()),
                 m_ui.fontInputSizeSpinBox->value(), m_ui.powerOfTwoCheckBox->isChecked(),
                 charSets.c_str(), m_ui.antialisedCheckBox->isChecked(), m_ui.hintedCheckBox->isChecked());
 
@@ -82,6 +88,9 @@ void TextureFontCreatorGUI::updatePreview() {
     std::shared_ptr<QImage> image = img->getQImage();
     m_pixmap = QPixmap::fromImage(*image);
     
+
+    m_ui.imageSizeLabel->setText(QString("%1x%2 (%3)").arg(m_pixmap.width()).arg(m_pixmap.height()).arg(m_pixmap.width() * m_pixmap.height()));
+
     // scale pixmap by selected factor
     m_pixmap = m_pixmap.scaled(m_pixmap.width() * m_ui.zoomSlider->value(),
             m_pixmap.height() * m_ui.zoomSlider->value(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
@@ -106,12 +115,13 @@ void TextureFontCreatorGUI::browseFontPath() {
     }
 }
 
+
+
 void TextureFontCreatorGUI::saveAs() {
     QString filename = QFileDialog::getSaveFileName( this, "Save Texture Font", m_lastSavePath, "Binary Texture Fonts (*.ytf);;All Files (*)");
     if (!filename.isEmpty()) {
-        // std::cout << "Saved file to " << filename.toLocal8Bit().constData() << std::endl;
         std::shared_ptr<TextureFontCreator> creator = createTextureFont();
-        creator->writeToFile(filename.toLocal8Bit().constData());
+        creator->writeToFile(toU8String(filename));
         m_lastSavePath = filename;
     }
 }
@@ -119,9 +129,10 @@ void TextureFontCreatorGUI::saveAs() {
 void TextureFontCreatorGUI::saveAsJson() {
     QString filename = QFileDialog::getSaveFileName( this, "Save Texture Font JSON", m_lastSavePath, "JSON Texture Fonts (*.json);;All Files (*)");
     if (!filename.isEmpty()) {
-        // std::cout << "Saved file to " << filename.toLocal8Bit().constData() << std::endl;
         std::shared_ptr<TextureFontCreator> creator = createTextureFont();
-        creator->writeToJsonFile(filename.toLocal8Bit().constData());
+
+        
+        creator->writeToJsonFile(toU8String(filename));
         m_lastSavePath = filename;
     }
 }

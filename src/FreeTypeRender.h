@@ -11,6 +11,8 @@
 #include <QImage>
 #include <string>
 #include <memory>
+#include <filesystem>
+
 #include <stdint.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -44,7 +46,7 @@ public:
      *  \param fontpath the path to the TrueType font
      *  \param fontSize size of the font in pixels
      */
-    FreeTypeRender(const std::string& fontpath, double fontSize, bool enableAntiAliasing = true, bool enableHinting = true);
+    FreeTypeRender(const std::filesystem::path& fontpath, double fontSize, bool enableAntiAliasing = true, bool enableHinting = true);
     virtual ~FreeTypeRender();
 
     /*! \brief renders a single character

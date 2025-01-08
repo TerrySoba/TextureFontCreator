@@ -14,7 +14,7 @@
 #include <unicode/unistr.h>
 #include <sstream>
 
-FreeTypeRender::FreeTypeRender(const std::string& fontpath, double fontSize, bool enableAntiAliasing, bool enableHinting)
+FreeTypeRender::FreeTypeRender(const std::filesystem::path& fontpath, double fontSize, bool enableAntiAliasing, bool enableHinting)
     : m_enableAntiAliasing(enableAntiAliasing), m_enableHinting(enableHinting)
 {
     // now init Freetype2
@@ -27,13 +27,13 @@ FreeTypeRender::FreeTypeRender(const std::string& fontpath, double fontSize, boo
     }
 
     // now load font face
-    error = FT_New_Face(m_library, fontpath.c_str(), 0, &m_face);
+    error = FT_New_Face(m_library, reinterpret_cast<const char*>(fontpath.u8string().c_str()), 0, &m_face);
     if (error == FT_Err_Unknown_File_Format) {
         throw std::runtime_error("Font file is in unsupported format.");
     } else if (error) {
         throw std::runtime_error("Font file could not be read.");
     }
-    error = FT_Set_Pixel_Sizes(m_face,      /* handle to face object */
+    error = FT_Set_Pixel_Sizes(m_face,    /* handle to face object */
                                0,         /* pixel_width */
                                fontSize); /* pixel_height */
 

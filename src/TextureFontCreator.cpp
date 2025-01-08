@@ -6,7 +6,7 @@
  */
 
 #include "TextureFontCreator.h"
-#include <unicode/unistr.h>
+
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -70,18 +70,54 @@ private:
 };
 
 
-TextureFontCreator::TextureFontCreator(const std::string& fontpath, double fontSize, bool forcePowerOfTwoSize, const std::string& chars, bool enableAntiAliasing, bool enableHinting) {
+
+static std::u32string toU32String(const std::u8string& str) {
+    std::u32string result;
+    for (size_t i = 0; i < str.size(); ) {
+        char32_t ch = 0;
+        uint8_t byte = str.at(i);
+        if (byte < 0x80) {
+            ch = byte;
+            ++i;
+        } else if ((byte & 0xE0) == 0xC0) {
+            ch = ((byte & 0x1F) << 6) | (str.at(i + 1) & 0x3F);
+            i += 2;
+        } else if ((byte & 0xF0) == 0xE0) {
+            ch = ((byte & 0x0F) << 12) | ((str.at(i + 1) & 0x3F) << 6) | (str.at(i + 2) & 0x3F);
+            i += 3;
+        } else if ((byte & 0xF8) == 0xF0) {
+            ch = ((byte & 0x07) << 18) | ((str.at(i + 1) & 0x3F) << 12) | ((str.at(i + 2) & 0x3F) << 6) | (str.at(i + 3) & 0x3F);
+            i += 4;
+        } else {
+            throw std::runtime_error("Invalid UTF-8 sequence.");
+        }
+        result.push_back(ch);
+    }
+    return result;
+}
+
+
+TextureFontCreator::TextureFontCreator(
+    const std::filesystem::path& fontpath,
+    double fontSize,
+    bool forcePowerOfTwoSize,
+    const std::u8string& chars,
+    bool enableAntiAliasing,
+    bool enableHinting)
+{
+
     FreeTypeRender renderer(fontpath, fontSize, enableAntiAliasing, enableHinting);
     m_fontName = renderer.getFontName();
-    icu::UnicodeString str(chars.c_str(), "UTF-8");
+  
+    std::u32string str = toU32String(chars);
 
     // eliminate duplicates by putting the characters in a set
-    std::set<uint32_t> characterSet;
+    std::set<char32_t> characterSet;
     for (int32_t pos = 0; pos < str.length(); pos++) {
-        characterSet.insert(str.char32At(pos));
+        characterSet.insert(str.at(pos));
     }
 
-    for (uint32_t unicode : characterSet) {
+    for (char32_t unicode : characterSet) {
         std::shared_ptr<ImageCharacter> imgChar = renderer.renderUnicodeCharacter(unicode);
         ImageOffset imgOff;
         imgOff.imgChar = imgChar;
@@ -173,14 +209,13 @@ void writeToStream(std::ostream& stream, const T& data)
     stream.write(reinterpret_cast<const char*>(&data), sizeof(T));
 }
 
-void TextureFontCreator::writeToFile(const std::string& path) {
+void TextureFontCreator::writeToFile(const std::filesystem::path& path) {
     // This code was only tested on little endian systems.
     // If not otherwise specified all values are little endian.
-
-    std::fstream fp(std::filesystem::u8path(path), std::fstream::out | std::fstream::binary);
+    std::fstream fp(path, std::fstream::out | std::fstream::binary);
     if (fp.fail()) {
         std::stringstream errorText;
-        errorText << "Could not open file \"" << path << "\" for writing. Aborting...";
+        errorText << "Could not open file \"" << path.native() << "\" for writing. Aborting...";
         throw std::runtime_error(errorText.str());
     }
 
@@ -230,7 +265,7 @@ void TextureFontCreator::writeToFile(const std::string& path) {
 }
 
 
-void TextureFontCreator::writeToJsonFile(const std::string& path)
+void TextureFontCreator::writeToJsonFile(const std::filesystem::path& path)
 {
     nlohmann::json json;
 
@@ -268,10 +303,10 @@ void TextureFontCreator::writeToJsonFile(const std::string& path)
 
     }
 
-    std::fstream fp(std::filesystem::u8path(path), std::fstream::out | std::fstream::binary);
+    std::fstream fp(path, std::fstream::out | std::fstream::binary);
     if (fp.fail()) {
         std::stringstream errorText;
-        errorText <<"Could not open file \"" << path << "\" for writing. Aborting...";
+        errorText <<"Could not open file \"" << path.native() << "\" for writing. Aborting...";
         throw std::runtime_error(errorText.str());
     }
 

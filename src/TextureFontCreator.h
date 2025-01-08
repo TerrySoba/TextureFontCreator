@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <vector>
 #include <memory>
+#include <filesystem>
+
 #include "GrayImage.h"
 #include "FreeTypeRender.h"
 
@@ -24,17 +26,17 @@ class TextureFontCreator {
 public:
     virtual ~TextureFontCreator();
     TextureFontCreator(
-        const std::string& fontpath,
+        const std::filesystem::path& fontpath,
         double fontSize,
         bool forcePowerOfTwoSize,
-        const std::string& chars,
+        const std::u8string& chars,
         bool enableAntiAliasing,
         bool enableHinting);
 
     std::shared_ptr<GrayImage> getImage() { return m_image; }
 
-    void writeToFile(const std::string& path);
-    void writeToJsonFile(const std::string& path);
+    void writeToFile(const std::filesystem::path& path);
+    void writeToJsonFile(const std::filesystem::path& path);
 
     std::string getFontName() { return m_fontName; }
 
