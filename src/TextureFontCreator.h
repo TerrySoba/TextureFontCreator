@@ -37,6 +37,7 @@ public:
 
     void writeToFile(const std::filesystem::path& path);
     void writeToJsonFile(const std::filesystem::path& path);
+    void writeToSimpleFile(const std::filesystem::path& path);
 
     std::string getFontName() { return m_fontName; }
 

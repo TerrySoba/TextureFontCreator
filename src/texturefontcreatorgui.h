@@ -23,6 +23,7 @@ public slots:
     void updatePreview();
     void saveAs();
     void saveAsJson();
+    void saveAsSimple();
 
     void showAboutDialog();
 

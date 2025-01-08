@@ -46,6 +46,7 @@ TextureFontCreatorGUI::TextureFontCreatorGUI(QWidget *parent)
     connect(m_ui.updatePreviewButton, SIGNAL(clicked()), this, SLOT(updatePreview()));
     connect(m_ui.actionSave_Texture_Font, SIGNAL(triggered(bool)), this, SLOT(saveAs()));
     connect(m_ui.actionSave_JSON_File, SIGNAL(triggered(bool)), this, SLOT(saveAsJson()));
+    connect(m_ui.actionSave_Simple_Font, SIGNAL(triggered(bool)), this, SLOT(saveAsSimple()));
 
     connect(m_ui.actionAbout, SIGNAL(triggered(bool)), this, SLOT(showAboutDialog()));
 
@@ -164,6 +165,16 @@ void TextureFontCreatorGUI::saveAsJson() {
         m_lastSavePath = filename;
     }
 }
+
+void TextureFontCreatorGUI::saveAsSimple() {
+    QString filename = QFileDialog::getSaveFileName( this, "Save Texture Font Simple", m_lastSavePath, "Simple Texture Fonts (*.stf);;All Files (*)");
+    if (!filename.isEmpty()) {
+        std::shared_ptr<TextureFontCreator> creator = createTextureFont();
+        creator->writeToSimpleFile(toU8String(filename));
+        m_lastSavePath = filename;
+    }
+}
+
 
 
 TextureFontCreatorGUI::~TextureFontCreatorGUI()

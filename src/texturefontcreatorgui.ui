@@ -13,10 +13,6 @@
   <property name="windowTitle">
    <string>Texture Font Creator</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>:/new/prefix1/Icon</normaloff>:/new/prefix1/Icon</iconset>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
@@ -262,6 +258,16 @@
               </widget>
              </item>
              <item>
+              <widget class="QSpinBox" name="spinBox">
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>20</number>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QSlider" name="zoomSlider">
                <property name="minimum">
                 <number>1</number>
@@ -335,7 +341,7 @@
      <x>0</x>
      <y>0</y>
      <width>944</width>
-     <height>19</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -401,6 +407,38 @@
     <hint type="destinationlabel">
      <x>399</x>
      <y>272</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>zoomSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>616</x>
+     <y>115</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>691</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>zoomSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>825</x>
+     <y>115</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>613</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>

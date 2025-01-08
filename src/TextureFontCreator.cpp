@@ -13,6 +13,7 @@
 #include <set>
 #include <sstream>
 #include <filesystem>
+#include <iconv.h>
 
 #include <nlohmann/json.hpp>
 #include <QBuffer>
@@ -312,6 +313,103 @@ void TextureFontCreator::writeToJsonFile(const std::filesystem::path& path)
 
     fp << json.dump(4);
     fp.close();
+}
+
+
+class UTF32toCP437Converter {
+public:
+    UTF32toCP437Converter()
+    {
+        if ((m_cd = iconv_open("CP437", "UTF-32")) == (iconv_t)(-1))
+        {
+            throw std::runtime_error("Cannot open converter");
+        }
+    }
+
+    ~UTF32toCP437Converter()
+    {
+        iconv_close(m_cd);
+    }
+
+
+    std::string convert(const std::u32string& str)
+    {
+        std::vector<char> inVec((const char*)str.data(), ((const char*)str.data()) + str.size() * 4);
+
+        char* inptr = inVec.data();
+        size_t inleft = inVec.size();
+
+        std::vector<char> outVec(inVec.size());
+        char* outptr = outVec.data();
+        size_t outleft = outVec.size();
+
+        int rc = iconv(m_cd, &inptr, &inleft, &outptr, &outleft);
+        if (rc == -1)
+        {
+            throw std::runtime_error("Error in converting characters");
+        }
+
+        return std::string(outVec.data(), outVec.size() - outleft);
+    }
+
+private:
+    iconv_t m_cd;
+};
+
+void TextureFontCreator::writeToSimpleFile(const std::filesystem::path& path)
+{
+    // This code was only tested on little endian systems.
+    // If not otherwise specified all values are little endian.
+    std::fstream fp(path, std::fstream::out | std::fstream::binary);
+    if (fp.fail()) {
+        std::stringstream errorText;
+        errorText << "Could not open file \"" << path.native() << "\" for writing. Aborting...";
+        throw std::runtime_error(errorText.str());
+    }
+
+    std::string fileSignature = "stf252";
+    fp.write(fileSignature.data(), fileSignature.size());
+
+    uint16_t formatVersion = 1;
+    writeToStream(fp, formatVersion);
+
+    uint16_t width  = m_image->getWidth();
+    uint16_t height = m_image->getHeight();
+    writeToStream(fp, width);  // write width of image
+    writeToStream(fp, height); // write height of image
+
+    {
+        GrayImage imageCopy(*m_image);
+        for (uint32_t row = 0; row < imageCopy.getHeight(); row++) { // write image to file
+            fp.write(reinterpret_cast<const char*>(imageCopy.getRow(row)),
+                     imageCopy.getWidth());
+        }
+    }
+
+    uint16_t noOfCharacters = m_imageCharacters.size();
+    writeToStream(fp, noOfCharacters); // write number of characters
+
+    UTF32toCP437Converter converter;
+    for (ImageOffset& imgOff : m_imageCharacters)
+    {
+        std::u32string in;
+        in.push_back(imgOff.imgChar->unicode);
+        std::string cp437 = converter.convert(in);
+        writeToStream(fp, (uint8_t)cp437.at(0)); // write cp437 codepoint of character
+        writeToStream(fp, (int16_t)imgOff.imgChar->bitmap_left); // write left bearing of character
+        writeToStream(fp, (int16_t)imgOff.imgChar->bitmap_top); // write top bearing of character
+        writeToStream(fp, (int16_t)ceil(imgOff.imgChar->horiAdvance)); // horizontal advance of character
+        writeToStream(fp, (int16_t)ceil(imgOff.imgChar->vertAdvance)); // vertical advance of character
+        writeToStream(fp, (int16_t)imgOff.left); // left offset of character in image
+        writeToStream(fp, (int16_t)imgOff.top); // top offset of character in image
+
+        uint32_t charWidth = imgOff.imgChar->image->getWidth();
+        uint32_t charHeight = imgOff.imgChar->image->getHeight();
+
+        writeToStream(fp, (int16_t)charWidth); // width of character
+        writeToStream(fp, (int16_t)charHeight); // height of character
+    }
+
 }
 
 
