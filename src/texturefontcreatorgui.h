@@ -6,9 +6,25 @@
 #include <QPixmap>
 #include <QGraphicsScene>
 #include <QUiLoader>
+
 #include <memory>
+#include <optional>
 
 #include "TextureFontCreator.h"
+
+struct GuiParameters {
+    std::filesystem::path fontPath;
+    double fontSize;
+    bool powerOfTwo;
+    bool antialised;
+    bool hinted;
+    std::optional<std::u8string> customCharacterSet;
+    bool ascii;
+    bool iso8859_15;
+    bool japaneseHiragana;
+    bool japaneseKatakana;
+    bool japaneseKanji;
+};
 
 class TextureFontCreatorGUI : public QMainWindow
 {
@@ -27,9 +43,10 @@ public slots:
 
     void showAboutDialog();
 
-private:
-    std::shared_ptr<TextureFontCreator> createTextureFont();
+private: // methods
+    std::optional<GuiParameters> getGuiSettings();
 
+private: // members
     Ui::TextureFontCreatorGUIClass m_ui;
     QPixmap m_pixmap;
     QString m_lastSavePath;

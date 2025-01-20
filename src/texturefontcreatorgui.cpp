@@ -1,18 +1,62 @@
 #include "texturefontcreatorgui.h"
 
-#include <QFileDialog>
 #include "FreeTypeRender.h"
-
-#include <string>
 #include "character_sets.h"
+
+#include <QFileDialog>
 #include <QSettings>
 #include <QGraphicsItem>
+#include <QMessageBox>
+
+#include <string>
 
 namespace { // anonymous namespace
 
-std::u8string toU8String(const QString& str) {
+std::u8string toU8String(const QString& str)
+{
     return std::u8string(reinterpret_cast<const char8_t*>(str.toUtf8().constData()));
 }
+
+QString toQString(const std::u8string& str)
+{
+    return QString::fromUtf8(reinterpret_cast<const char*>(str.c_str()));
+}
+
+
+std::shared_ptr<TextureFontCreator> createTextureFont(const GuiParameters& parameters)
+{
+    // create string with selected charsets
+    std::u8string charSets;
+    if (parameters.ascii) {
+        charSets += CHAR_SET_ASCII;
+    }
+    if (parameters.iso8859_15) {
+        charSets += CHAR_SET_ISO_8859_15_danish;
+    }
+    
+    charSets += parameters.customCharacterSet.value_or(u8"");
+    
+    if (parameters.japaneseHiragana) {
+        charSets += JAPANESE_HIRAGANA;
+    }
+    if (parameters.japaneseKatakana) {
+        charSets += JAPANESE_KATAKANA;
+    }
+    if (parameters.japaneseKanji) {
+        charSets += JAPANESE_JOYO_KANJI;
+    }
+
+    auto creator = std::make_shared<TextureFontCreator>(
+        parameters.fontPath,
+        parameters.fontSize,
+        parameters.powerOfTwo,
+        charSets,
+        parameters.antialised,
+        parameters.hinted);
+
+    return creator;
+}
+
 
 } // anonymous namespace
 
@@ -78,47 +122,58 @@ void TextureFontCreatorGUI::showAboutDialog()
     }
 }
 
-std::shared_ptr<TextureFontCreator> TextureFontCreatorGUI::createTextureFont() {
-    // create string with selected charsets
-    std::u8string charSets;
-    if (m_ui.ASCII_checkBox->isChecked()) {
-        charSets += CHAR_SET_ASCII;
+std::optional<GuiParameters> TextureFontCreatorGUI::getGuiSettings()
+{
+    GuiParameters params;
+    params.fontPath = toU8String(m_ui.fontPathEdit->text());
+    params.fontSize = m_ui.fontInputSizeSpinBox->value();
+    params.powerOfTwo = m_ui.powerOfTwoCheckBox->isChecked();
+    params.antialised = m_ui.antialisedCheckBox->isChecked();
+    params.hinted = m_ui.hintedCheckBox->isChecked();
+    if (m_ui.customCharacterSetGroupBox->isChecked())
+    {
+        params.customCharacterSet = toU8String(m_ui.customCharacterSetTextEdit->document()->toPlainText());
     }
-    if (m_ui.ISO_8859_15_checkBox->isChecked()) {
-        charSets += CHAR_SET_ISO_8859_15_danish;
-    }
-    if (m_ui.customCharacterSetGroupBox->isChecked()) {
-        auto utf8_text =
-                toU8String(m_ui.customCharacterSetTextEdit->document()->toPlainText());
-        charSets += utf8_text;
-    }
-    if (m_ui.japaneseHiraganaCheckbox->isChecked()) {
-        charSets += JAPANESE_HIRAGANA;
-    }
-    if (m_ui.japaneseKatakanaCheckbox->isChecked()) {
-        charSets += JAPANESE_KATAKANA;
-    }
-    if (m_ui.japaneseKanjiCheckbox->isChecked()) {
-        charSets += JAPANESE_JOYO_KANJI;
+    params.ascii = m_ui.ASCII_checkBox->isChecked();
+    params.iso8859_15 = m_ui.ISO_8859_15_checkBox->isChecked();
+    params.japaneseHiragana = m_ui.japaneseHiraganaCheckbox->isChecked();
+    params.japaneseKatakana = m_ui.japaneseKatakanaCheckbox->isChecked();
+    params.japaneseKanji = m_ui.japaneseKanjiCheckbox->isChecked();
+
+    if (!std::filesystem::exists(params.fontPath))
+    {
+        // display message box
+        QMessageBox::critical(this, "Error", QString("Font file \"%1\" does not exist.").arg(toQString(params.fontPath.u8string())));
+        return {};
     }
 
-    auto creator = std::make_shared<TextureFontCreator>(toU8String(m_ui.fontPathEdit->text()),
-                m_ui.fontInputSizeSpinBox->value(), m_ui.powerOfTwoCheckBox->isChecked(),
-                charSets.c_str(), m_ui.antialisedCheckBox->isChecked(), m_ui.hintedCheckBox->isChecked());
-
-    return creator;
+    return params;
 }
 
-void TextureFontCreatorGUI::updatePreview() {
+void TextureFontCreatorGUI::updatePreview()
+{
+    auto parameters = getGuiSettings();
+    if (!parameters)
+    {
+        return;
+    }
 
-    std::shared_ptr<TextureFontCreator> creator = createTextureFont();
+    std::shared_ptr<TextureFontCreator> creator = createTextureFont(*parameters);
 
     std::shared_ptr<GrayImage> img = creator->getImage();
     std::shared_ptr<QImage> image = img->getQImage();
     m_pixmap = QPixmap::fromImage(*image);
-    
 
-    m_ui.imageSizeLabel->setText(QString("%1x%2 (%3)").arg(m_pixmap.width()).arg(m_pixmap.height()).arg(m_pixmap.width() * m_pixmap.height()));
+    int width = m_pixmap.width();
+    int height = m_pixmap.height();
+    int pixelCount = width * height;
+
+    QString sizeText = QString("%1").arg(pixelCount);
+    for (int i = sizeText.size() - 3; i > 0; i -= 3) {
+        sizeText.insert(i, '.');
+    }
+
+    m_ui.imageSizeLabel->setText(QString("%1x%2 (%3 pixels)").arg(width).arg(height).arg(sizeText));
 
     // scale pixmap by selected factor
     m_pixmap = m_pixmap.scaled(m_pixmap.width() * m_ui.zoomSlider->value(),
@@ -149,7 +204,12 @@ void TextureFontCreatorGUI::browseFontPath() {
 void TextureFontCreatorGUI::saveAs() {
     QString filename = QFileDialog::getSaveFileName( this, "Save Texture Font", m_lastSavePath, "Binary Texture Fonts (*.ytf);;All Files (*)");
     if (!filename.isEmpty()) {
-        std::shared_ptr<TextureFontCreator> creator = createTextureFont();
+        auto parameters = getGuiSettings();
+        if (!parameters)
+        {
+            return;
+        }
+        std::shared_ptr<TextureFontCreator> creator = createTextureFont(*parameters);
         creator->writeToFile(toU8String(filename));
         m_lastSavePath = filename;
     }
@@ -158,9 +218,12 @@ void TextureFontCreatorGUI::saveAs() {
 void TextureFontCreatorGUI::saveAsJson() {
     QString filename = QFileDialog::getSaveFileName( this, "Save Texture Font JSON", m_lastSavePath, "JSON Texture Fonts (*.json);;All Files (*)");
     if (!filename.isEmpty()) {
-        std::shared_ptr<TextureFontCreator> creator = createTextureFont();
-
-        
+        auto parameters = getGuiSettings();
+        if (!parameters)
+        {
+            return;
+        }
+        std::shared_ptr<TextureFontCreator> creator = createTextureFont(*parameters);
         creator->writeToJsonFile(toU8String(filename));
         m_lastSavePath = filename;
     }
@@ -169,7 +232,12 @@ void TextureFontCreatorGUI::saveAsJson() {
 void TextureFontCreatorGUI::saveAsSimple() {
     QString filename = QFileDialog::getSaveFileName( this, "Save Texture Font Simple", m_lastSavePath, "Simple Texture Fonts (*.stf);;All Files (*)");
     if (!filename.isEmpty()) {
-        std::shared_ptr<TextureFontCreator> creator = createTextureFont();
+        auto parameters = getGuiSettings();
+        if (!parameters)
+        {
+            return;
+        }
+        std::shared_ptr<TextureFontCreator> creator = createTextureFont(*parameters);
         creator->writeToSimpleFile(toU8String(filename));
         m_lastSavePath = filename;
     }

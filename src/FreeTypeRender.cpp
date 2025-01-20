@@ -11,7 +11,6 @@
 #include <cstring>
 #include <stdint.h>
 #include <iostream>
-#include <unicode/unistr.h>
 #include <sstream>
 
 FreeTypeRender::FreeTypeRender(const std::filesystem::path& fontpath, double fontSize, bool enableAntiAliasing, bool enableHinting)
