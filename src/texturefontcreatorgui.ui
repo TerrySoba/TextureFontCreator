@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>944</width>
-    <height>714</height>
+    <width>763</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -329,6 +329,29 @@
           </layout>
          </widget>
         </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_5">
+          <property name="title">
+           <string>Text Preview</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QLabel" name="textPreviewLabel">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="textPreviewLineEdit">
+             <property name="text">
+              <string>The quick brown fox jumps over the lazy dog.</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -340,8 +363,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>944</width>
-     <height>24</height>
+     <width>763</width>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -371,17 +394,35 @@
   </action>
   <action name="actionSave_Texture_Font">
    <property name="text">
-    <string>Save Texture Font</string>
+    <string>Save Texture Font...</string>
+   </property>
+   <property name="iconText">
+    <string>Save Texture Font...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Texture Font...</string>
    </property>
   </action>
   <action name="actionSave_JSON_File">
    <property name="text">
-    <string>Save JSON File</string>
+    <string>Save JSON File...</string>
+   </property>
+   <property name="iconText">
+    <string>Save JSON File...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save JSON File...</string>
    </property>
   </action>
   <action name="actionSave_Simple_Font">
    <property name="text">
-    <string>Save Simple Font</string>
+    <string>Save Simple Font...</string>
+   </property>
+   <property name="iconText">
+    <string>Save Simple Font...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Simple Font...</string>
    </property>
   </action>
   <action name="actionAbout">

@@ -417,3 +417,51 @@ TextureFontCreator::~TextureFontCreator() {
     // TODO Auto-generated destructor stub
 }
 
+enum class DrawStage
+{
+    CALCULATE_SIZE,
+    DRAW_IMAGE
+};
+
+std::shared_ptr<GrayImage> TextureFontCreator::renderText(const std::u8string& text)
+{
+    std::u32string utf32 = toU32String(text);
+
+    std::shared_ptr<GrayImage> result;
+
+    for (DrawStage stage : {DrawStage::CALCULATE_SIZE, DrawStage::DRAW_IMAGE})
+    {
+        int32_t top = 0;
+        int32_t left = 0;
+        int32_t maxHeight = 0;
+        for (char32_t unicode : utf32) {
+            for (ImageOffset& imgOff : m_imageCharacters) {
+                if (imgOff.imgChar->unicode == unicode) {
+                    if (stage == DrawStage::DRAW_IMAGE)
+                    {
+                        result->blit(*(imgOff.imgChar->image), left + imgOff.imgChar->bitmap_left, ceil(imgOff.imgChar->vertAdvance) - imgOff.imgChar->bitmap_top);
+                    }
+
+                    left += ceil(imgOff.imgChar->horiAdvance);
+
+                    auto height = ceil(imgOff.imgChar->vertAdvance) - imgOff.imgChar->bitmap_top + imgOff.imgChar->image->getHeight();
+
+                    if (height > maxHeight)
+                    {
+                        maxHeight = height;
+                    }
+                        
+                    break;
+                }
+            }
+        }
+
+        if (stage == DrawStage::CALCULATE_SIZE)
+        {
+            result = std::shared_ptr<GrayImage>(new GrayImage(left, maxHeight));
+        }
+    }
+    
+
+    return result;
+}

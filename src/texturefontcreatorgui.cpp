@@ -188,6 +188,17 @@ void TextureFontCreatorGUI::updatePreview()
     m_ui.previewGraphicsView->ensureVisible(m_pixmapItem);
 
     m_ui.fontNameLabel->setText(creator->getFontName().c_str());
+
+
+    std::u8string sampleText = toU8String(m_ui.textPreviewLineEdit->text());
+    std::shared_ptr<GrayImage> sampleImage = creator->renderText(sampleText);
+    std::shared_ptr<QImage> sampleQImage = sampleImage->getQImage();
+
+    QPixmap samplePixmap = QPixmap::fromImage(*sampleQImage);
+    samplePixmap = samplePixmap.scaled(samplePixmap.width() * m_ui.zoomSlider->value(),
+            samplePixmap.height() * m_ui.zoomSlider->value(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    
+    m_ui.textPreviewLabel->setPixmap(samplePixmap);
 }
 
 

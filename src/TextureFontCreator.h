@@ -41,6 +41,8 @@ public:
 
     std::string getFontName() { return m_fontName; }
 
+    std::shared_ptr<GrayImage> renderText(const std::u8string& text);
+
 private:
     std::shared_ptr<GrayImage> m_image;
     std::vector<ImageOffset> m_imageCharacters;
