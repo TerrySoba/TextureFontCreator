@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QGraphicsItem>
 #include <QMessageBox>
+#include <QStyle>
 
 #include <string>
 
@@ -81,6 +82,13 @@ TextureFontCreatorGUI::TextureFontCreatorGUI(QWidget *parent)
       m_aboutDialog(nullptr)
 {
     m_ui.setupUi(this);
+
+    // set icons for menu items
+    m_ui.actionSave_Texture_Font->setIcon(QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton));
+    m_ui.actionSave_JSON_File->setIcon(QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton));
+    m_ui.actionSave_Simple_Font->setIcon(QApplication::style()->standardIcon(QStyle::SP_DialogSaveButton));
+    m_ui.actionAbout->setIcon(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation));
+    m_ui.actionExit->setIcon(QApplication::style()->standardIcon(QStyle::SP_DialogCloseButton));
 
     m_aboutDialog = createAboutDialog();
 
